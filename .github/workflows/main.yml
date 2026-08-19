@@ -10,30 +10,41 @@ on:
 
 jobs:
   build:
+    name: Linux Qt Build
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout source
+      - name: Checkout repository
         uses: actions/checkout@v4
 
       - name: Install Qt
-        uses: jurplel/install-qt-action@v4
+        uses: jurplel/install-qt-action@v4.3.1
         with:
           version: '6.8.*'
-          target: desktop
-          arch: linux_gcc_64
-          modules: qtnetwork
+          host: 'linux'
+          target: 'desktop'
+          arch: 'linux_gcc_64'
+          modules: 'qtnetwork'
           setup-python: true
           cache: false
 
-      - name: Show Qt version
-        run: qmake --version
+      - name: Verify Qt
+        run: |
+          echo "Qt root: $QT_ROOT_DIR"
+          qmake --version
+
+      - name: Verify CMake
+        run: |
+          cmake --version
 
       - name: Configure CMake
-        run: cmake -S . -B build -DBUILD_TESTS=ON
+        run: |
+          cmake -S . -B build -DBUILD_TESTS=ON
 
-      - name: Build
-        run: cmake --build build --parallel
+      - name: Build project
+        run: |
+          cmake --build build --parallel
 
-      - name: Test
-        run: ctest --test-dir build --output-on-failure
+      - name: Run tests
+        run: |
+          ctest --test-dir build --output-on-failure
