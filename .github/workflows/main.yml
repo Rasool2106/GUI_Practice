@@ -13,22 +13,27 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-
-      - name: Checkout source code
+      - name: Checkout source
         uses: actions/checkout@v4
 
       - name: Install Qt
         uses: jurplel/install-qt-action@v4
         with:
-          version: '6.8.3'
-          modules: 'qtnetwork'
-          cache: true
+          version: '6.8.*'
+          target: desktop
+          arch: linux_gcc_64
+          modules: qtnetwork
+          setup-python: true
+          cache: false
+
+      - name: Show Qt version
+        run: qmake --version
 
       - name: Configure CMake
         run: cmake -S . -B build -DBUILD_TESTS=ON
 
-      - name: Build project
+      - name: Build
         run: cmake --build build --parallel
 
-      - name: Run tests
+      - name: Test
         run: ctest --test-dir build --output-on-failure
